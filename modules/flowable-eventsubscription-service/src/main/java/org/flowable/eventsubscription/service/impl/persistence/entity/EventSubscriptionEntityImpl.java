@@ -41,6 +41,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     protected String scopeDefinitionId;
     protected String scopeType;
     protected String tenantId;
+    protected String transitionType;
     
     public EventSubscriptionEntityImpl() {}
 
@@ -195,6 +196,16 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEventSubscript
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public String getTransitionType() {
+        return transitionType;
+    }
+
+    @Override
+    public void setTransitionType(String transitionType) {
+        this.transitionType = transitionType;
     }
 
     @Override

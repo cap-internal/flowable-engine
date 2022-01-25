@@ -202,7 +202,19 @@ public class CmmnDeployer implements EngineDeployer {
                     .scopeDefinitionId(caseDefinition.getId())
                     .scopeType(ScopeTypes.CMMN)
                     .tenantId(caseDefinition.getTenantId())
+                    .transitionType("start")
                     .create();
+            }
+
+            if (caseModel.getReactivateEventListener() != null && caseModel.getReactivateEventListener().getEventType() != null) {
+                eventSubscriptionService.createEventSubscriptionBuilder()
+                        .eventType(caseModel.getReactivateEventListener().getEventType())
+                        .configuration(getEventCorrelationKey(caseModel))
+                        .scopeDefinitionId(caseDefinition.getId())
+                        .scopeType(ScopeTypes.CMMN)
+                        .tenantId(caseDefinition.getTenantId())
+                        .transitionType("reactivate")
+                        .create();
             }
 
         }

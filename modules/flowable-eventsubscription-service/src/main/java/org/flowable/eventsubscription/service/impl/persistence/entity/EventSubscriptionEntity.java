@@ -50,4 +50,6 @@ public interface EventSubscriptionEntity extends EventSubscription, Entity, HasR
     void setScopeType(String scopeType);
 
     void setTenantId(String tenantId);
+
+    void setTransitionType(String transitionType);
 }

@@ -307,6 +307,7 @@ public class EventSubscriptionEntityManagerImpl
         eventSubscription.setScopeId(eventSubscriptionBuilder.getScopeId());
         eventSubscription.setScopeDefinitionId(eventSubscriptionBuilder.getScopeDefinitionId());
         eventSubscription.setScopeType(eventSubscriptionBuilder.getScopeType());
+        eventSubscription.setTransitionType(eventSubscriptionBuilder.getTransitionType());
 
         if (eventSubscriptionBuilder.getTenantId() != null) {
             eventSubscription.setTenantId(eventSubscriptionBuilder.getTenantId());

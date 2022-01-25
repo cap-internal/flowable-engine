@@ -33,6 +33,7 @@ public class EventSubscriptionBuilderImpl implements EventSubscriptionBuilder {
     protected String scopeType;
     protected String tenantId;
     protected String configuration;
+    protected String transitionType;
 
     public EventSubscriptionBuilderImpl() {
         
@@ -121,6 +122,12 @@ public class EventSubscriptionBuilderImpl implements EventSubscriptionBuilder {
     }
 
     @Override
+    public EventSubscriptionBuilder transitionType(String transitionType) {
+        this.transitionType = transitionType;
+        return this;
+    }
+
+    @Override
     public EventSubscription create() {
         return eventSubscriptionService.createEventSubscription(this);
     }
@@ -188,5 +195,10 @@ public class EventSubscriptionBuilderImpl implements EventSubscriptionBuilder {
     @Override
     public String getConfiguration() {
         return configuration;
+    }
+
+    @Override
+    public String getTransitionType() {
+        return transitionType;
     }
 }

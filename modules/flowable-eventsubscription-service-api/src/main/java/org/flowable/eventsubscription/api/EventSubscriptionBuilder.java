@@ -42,6 +42,8 @@ public interface EventSubscriptionBuilder {
 
     EventSubscriptionBuilder configuration(String configuration);
 
+    EventSubscriptionBuilder transitionType(String transitionType);
+
     EventSubscription create();
     
     String getEventType();
@@ -69,4 +71,6 @@ public interface EventSubscriptionBuilder {
     String getTenantId();
 
     String getConfiguration();
+
+    String getTransitionType();
 }

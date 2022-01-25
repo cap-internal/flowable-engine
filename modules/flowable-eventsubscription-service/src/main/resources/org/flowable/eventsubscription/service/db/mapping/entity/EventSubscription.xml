@@ -27,7 +27,8 @@
     <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR" />
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />     
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="transitionType" column="TRANSITION_TYPE_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="EVENT_TYPE_">
       <case value="message" resultMap="messageResultMap"/> 
       <case value="signal" resultMap="signalResultMap"/> 
@@ -115,7 +116,7 @@
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId}
       </if>
-      <if test="tenantIds != null and !tenantIds.empty">
+      <if test="tenantIds != null and !tenantIds.isEmpty()">
         and RES.TENANT_ID_ in
         <foreach item="item" index="index" collection="tenantIds" open="(" separator="," close=")">
             #{item}
@@ -127,7 +128,7 @@
       <if test="configuration != null">
           and RES.CONFIGURATION_ = #{configuration}
       </if>
-      <if test="configurations != null and !configurations.empty">
+      <if test="configurations != null and !configurations.isEmpty()">
           and RES.CONFIGURATION_ in
           <foreach item="item" index="index" collection="configurations" open="(" separator="," close=")">
               #{item}
@@ -193,7 +194,7 @@
               <if test="orQueryObject.tenantId != null">
                   or RES.TENANT_ID_ = #{orQueryObject.tenantId}
               </if>
-              <if test="orQueryObject.tenantIds != null and !orQueryObject.tenantIds.empty">
+              <if test="orQueryObject.tenantIds != null and !orQueryObject.tenantIds.isEmpty()">
                   or RES.TENANT_ID_ in
                   <foreach item="item" index="index" collection="orQueryObject.tenantIds" open="(" separator="," close=")">
                       #{item}
@@ -205,7 +206,7 @@
               <if test="orQueryObject.configuration != null">
                   or RES.CONFIGURATION_ = #{orQueryObject.configuration}
               </if>
-              <if test="orQueryObject.configurations != null and !orQueryObject.configurations.empty">
+              <if test="orQueryObject.configurations != null and !orQueryObject.configurations.isEmpty()">
                   or RES.CONFIGURATION_ in
                   <foreach item="item" index="index" collection="orQueryObject.configurations" open="(" separator="," close=")">
                       #{item}
@@ -865,7 +866,8 @@
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
             SCOPE_TYPE_,
-           	TENANT_ID_
+           	TENANT_ID_,
+            TRANSITION_TYPE_
     )
     values (#{id, jdbcType=VARCHAR},
             1, #{eventType, jdbcType=VARCHAR},
@@ -880,7 +882,8 @@
             #{scopeId, jdbcType=VARCHAR},
             #{scopeDefinitionId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR}
+            #{tenantId, jdbcType=VARCHAR},
+            #{transitionType, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -900,7 +903,8 @@
         SCOPE_ID_,
         SCOPE_DEFINITION_ID_,
         SCOPE_TYPE_,
-        TENANT_ID_
+        TENANT_ID_,
+        TRANSITION_TYPE_
         )
         values
         <foreach collection="list" item="eventSubscription" index="index" separator=",">
@@ -917,7 +921,8 @@
             #{eventSubscription.scopeId, jdbcType=VARCHAR},
             #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
             #{eventSubscription.scopeType, jdbcType=VARCHAR},
-            #{eventSubscription.tenantId, jdbcType=VARCHAR})
+            #{eventSubscription.tenantId, jdbcType=VARCHAR},
+            #{eventSubscription.transitionType, jdbcType=VARCHAR})
         </foreach>
     </insert>
 
@@ -939,7 +944,8 @@
             SCOPE_ID_,
             SCOPE_DEFINITION_ID_,
             SCOPE_TYPE_,
-            TENANT_ID_
+            TENANT_ID_,
+            TRANSITION_TYPE_
             )
             VALUES
             (#{eventSubscription.id, jdbcType=VARCHAR},
@@ -955,7 +961,8 @@
             #{eventSubscription.scopeId, jdbcType=VARCHAR},
             #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
             #{eventSubscription.scopeType, jdbcType=VARCHAR},
-            #{eventSubscription.tenantId, jdbcType=VARCHAR})
+            #{eventSubscription.tenantId, jdbcType=VARCHAR},
+            #{eventSubscription.transitionType, jdbcType=VARCHAR})
         </foreach>
         SELECT * FROM dual
     </insert>
@@ -1001,6 +1008,9 @@
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            </if>
+            <if test="originalPersistentState.transitionType != transitionType">
+                TRANSITION_TYPE_ = #{transitionType, jdbcType=VARCHAR}
             </if>
         </set>
         where ID_= #{id, jdbcType=VARCHAR}

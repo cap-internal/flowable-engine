@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn" exporter="Flowable Open Source Modeler" exporterVersion="6.7.3-SNAPSHOT">
+  <case id="testCaseReactivate" name="testCaseReactivate" flowable:initiatorVariableName="initiator">
+    <extensionElements>
+      <flowable:eventType xmlns:flowable="http://flowable.org/cmmn"><![CDATA[startEvent]]></flowable:eventType>
+      <flowable:startEventCorrelationConfiguration><![CDATA[storeAsUniqueReferenceId]]></flowable:startEventCorrelationConfiguration>
+    </extensionElements>
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <planItem id="planItem1" name="reactivate" definitionRef="sid-425BB242-AF48-4C54-93D4-32F98E36EE26"></planItem>
+      <planItem id="planItem2" name="terminate" definitionRef="sid-0D206255-BA73-4495-8205-1C711B8D1058"></planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem2">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <eventListener id="sid-425BB242-AF48-4C54-93D4-32F98E36EE26" name="reactivate" flowable:eventType="reactivate">
+        <extensionElements>
+          <flowable:eventType xmlns:flowable="http://flowable.org/cmmn"><![CDATA[reactivationEvent]]></flowable:eventType>
+        </extensionElements>
+      </eventListener>
+      <eventListener id="sid-0D206255-BA73-4495-8205-1C711B8D1058" name="terminate">
+        <extensionElements>
+          <flowable:eventType xmlns:flowable="http://flowable.org/cmmn"><![CDATA[terminationEvent]]></flowable:eventType>
+        </extensionElements>
+      </eventListener>
+      <exitCriterion id="sid-3108FC3D-05AC-4B96-907F-752A5AEA9710" sentryRef="sentry1"></exitCriterion>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testCaseReactivate">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-3108FC3D-05AC-4B96-907F-752A5AEA9710" cmmnElementRef="sid-3108FC3D-05AC-4B96-907F-752A5AEA9710">
+        <dc:Bounds height="22.0" width="14.0" x="781.6114078391344" y="353.7294619319891"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="30.0" width="30.0" x="75.0" y="407.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="30.0" width="30.0" x="690.0" y="349.7294619319891"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-03127EBB-0F26-46E2-9B11-9350F77B9CFF" cmmnElementRef="planItem2" targetCMMNElementRef="sid-3108FC3D-05AC-4B96-907F-752A5AEA9710">
+        <di:extension>
+          <flowable:docker type="source" x="15.0" y="15.0"></flowable:docker>
+          <flowable:docker type="target" x="7.0" y="11.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="719.9499973871385" y="364.7294619319891"></di:waypoint>
+        <di:waypoint x="781.6114078391344" y="364.7294619319891"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

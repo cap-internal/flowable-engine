@@ -13,6 +13,7 @@ create table ACT_RU_EVENT_SUBSCR (
     SCOPE_ID_ varchar(64),
     SCOPE_DEFINITION_ID_ varchar(64),
     SCOPE_TYPE_ varchar(64),
+    TRANSITION_TYPE_ varchar(64),
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

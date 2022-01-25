@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
@@ -77,7 +79,10 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     protected void handleEventSubscription(CmmnRuntimeService cmmnRuntimeService, EventSubscription eventSubscription,
             EventInstance eventInstance, Collection<CorrelationKey> correlationKeys) {
 
-        if (eventSubscription.getSubScopeId() != null) {
+        if ("reactivate".equals(eventSubscription.getTransitionType())) {
+            handleCaseReactivation(eventSubscription, correlationKeys);
+
+        } else if (eventSubscription.getSubScopeId() != null) {
 
             // When a subscope id is set, this means that a plan item instance is waiting for the event
 
@@ -150,6 +155,29 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
             }
         }
         return null;
+    }
+
+    /**
+     * Handles reactivation event subscription by finding completed case and reopening it.
+     * Reactivation is possible only if Case was started with storeAsUniqueReferenceId correlation configuration as in
+     * other case there are no ways how to find historic case instance
+     *
+     * @param eventSubscription {@link EventSubscription} which holds case definition related information
+     * @param correlationKeys for unique instance identification
+     */
+    protected void handleCaseReactivation(EventSubscription eventSubscription, Collection<CorrelationKey> correlationKeys) {
+        CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
+
+        HistoricCaseInstanceQuery caseInstanceQuery = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery()
+                .caseDefinitionId(eventSubscription.getScopeDefinitionId())
+                .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
+                .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE);
+
+        HistoricCaseInstance caseInstanceCount = caseInstanceQuery.singleResult();
+
+        if (caseInstanceCount != null) {
+            cmmnEngineConfiguration.getCmmnHistoryService().createCaseReactivationBuilder(caseInstanceCount.getId()).reactivate();
+        }
     }
 
     @Override

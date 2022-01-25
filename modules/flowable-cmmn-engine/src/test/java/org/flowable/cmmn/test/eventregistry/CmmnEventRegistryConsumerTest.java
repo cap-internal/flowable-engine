@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.List;
 import java.util.Random;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -612,6 +613,48 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
                 );
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testCaseReactivate.cmmn")
+    public void simpleEventBasedCaseReactivationTest() {
+        createEventModel("startEvent", "identifier");
+        createEventModel("terminationEvent", "identifier");
+        createEventModel("reactivationEvent", "identifier");
+
+        // After deploying, there should be start, terminate and reactivate events
+        List<EventSubscription> eventSubscriptions = cmmnRuntimeService.createEventSubscriptionQuery().scopeType(ScopeTypes.CMMN).list();
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getEventType, EventSubscription::getTransitionType)
+                .contains(tuple("startEvent", "start"), tuple("reactivationEvent", "reactivate"));
+
+        // trigger case start
+        inboundEventChannelAdapter.triggerEvent("startEvent", "identifier", "identifierValue");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseReactivate").singleResult();
+
+        assertThat(caseInstance.getState()).isEqualTo("active");
+
+        // trigger case termination
+        inboundEventChannelAdapter.triggerEvent("terminationEvent", "identifier", "identifierValue");
+
+        HistoricCaseInstance terminatedCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(terminatedCaseInstance.getState()).isEqualTo("terminated");
+
+        // trigger case reactivation
+        inboundEventChannelAdapter.triggerEvent("reactivationEvent", "identifier", "identifierValue");
+
+        terminatedCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(terminatedCaseInstance.getState()).isEqualTo("active");
+
+    }
+
+    private void createEventModel(String eventKey, String correlationParameter) {
+        getEventRepositoryService().createEventModelBuilder()
+                .key(eventKey)
+                .resourceName("myEvent.event")
+                .correlationParameter(correlationParameter, EventPayloadTypes.STRING)
+                .deploy();
+    }
+
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
         public InboundChannelModel inboundChannelModel;
@@ -653,6 +696,19 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
             }
             json.put("payload1", "Hello World");
             json.put("payload2", new Random().nextInt());
+            try {
+                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void triggerEvent(String eventName, String correlationKeyName, String correlationId) {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            ObjectNode json = objectMapper.createObjectNode();
+            json.put("type", eventName);
+            json.put(correlationKeyName, correlationId);
             try {
                 eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
             } catch (JsonProcessingException e) {

@@ -90,4 +90,9 @@ public interface EventSubscription {
      * The tenant identifier of this process instance
      */
     String getTenantId();
+
+    /**
+     * Returns the type of transition.
+     */
+    String getTransitionType();
 }
