@@ -42,6 +42,8 @@ import org.flowable.ui.common.model.RemoteUser;
 import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class PermissionService {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionService.class);
 
     @Autowired
     protected TaskService taskService;
@@ -231,6 +235,11 @@ public class PermissionService {
     public boolean hasReadPermissionOnCaseInstance(SecurityScope user, HistoricCaseInstance historicCaseInstance, String caseInstanceId) {
         if (historicCaseInstance == null) {
             throw new NotFoundException("Case instance not found for id " + caseInstanceId);
+        }
+        //For some reason start user is not set
+        if (historicCaseInstance.getStartUserId() == null) {
+            LOGGER.error("Case {} user id not set", caseInstanceId );
+            return true;
         }
 
         // Start user check
